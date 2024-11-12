@@ -59,7 +59,7 @@ public class SensorServiceImpl implements SensorService {
                         temperatureSensorEvent.getTemperatureF()
                 );
             }
-            case null, default -> payload = null;
+            case null, default -> throw new IllegalStateException("Unexpected value: " + sensorEvent.getType());
         }
         SensorEventAvro sensorEventAvro = new SensorEventAvro(
                 sensorEvent.getId(),
@@ -67,7 +67,11 @@ public class SensorServiceImpl implements SensorService {
                 sensorEvent.getTimestamp(),
                 payload
         );
-        ProducerRecord<String, SpecificRecordBase> producerRecord = new ProducerRecord<>(KafkaTopics.SENSORS, sensorEventAvro);
+        ProducerRecord<String, SpecificRecordBase> producerRecord = new ProducerRecord<>(
+                KafkaTopics.SENSORS,
+                sensorEvent.getHubId(),
+                sensorEventAvro
+        );
         kafkaClient.getProducer().send(producerRecord);
     }
 }

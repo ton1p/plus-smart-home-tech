@@ -19,7 +19,7 @@ import java.util.Properties;
 @Configuration
 public class KafkaClientConfiguration {
     @Bean
-    KafkaClient getClient() {
+    public KafkaClient getClient() {
         return new KafkaClient() {
             private Consumer<String, SpecificRecordBase> consumer;
 

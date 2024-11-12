@@ -42,10 +42,14 @@ public class HubServiceImpl implements HubService {
                 ScenarioRemovedEvent scenarioRemovedEvent = (ScenarioRemovedEvent) hubEvent;
                 payload = new ScenarioRemovedEventAvro(scenarioRemovedEvent.getName());
             }
-            case null, default -> payload = null;
+            case null, default -> throw new IllegalStateException("Unexpected value: " + hubEvent.getType());
         }
         HubEventAvro hubEventAvro = new HubEventAvro(hubEvent.getHubId(), hubEvent.getTimestamp(), payload);
-        ProducerRecord<String, SpecificRecordBase> producerRecord = new ProducerRecord<>(KafkaTopics.HUBS, hubEventAvro);
+        ProducerRecord<String, SpecificRecordBase> producerRecord = new ProducerRecord<>(
+                KafkaTopics.HUBS,
+                hubEvent.getHubId(),
+                hubEventAvro
+        );
         kafkaClient.getProducer().send(producerRecord);
     }
 }
