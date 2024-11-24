@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.kafka.telemetry.collector.event.DeviceActionAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.ScenarioConditionAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 
 import java.util.List;
 

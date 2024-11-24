@@ -8,8 +8,8 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
-import ru.yandex.practicum.kafka.telemetry.collector.event.HubEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
 public class GeneralAvroDeserializer implements Deserializer<SpecificRecordBase> {
     private final DecoderFactory decoderFactory = DecoderFactory.get();
