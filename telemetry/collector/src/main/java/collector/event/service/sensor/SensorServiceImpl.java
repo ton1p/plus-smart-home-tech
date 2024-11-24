@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.kafka.telemetry.collector.event.ClimateSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.LightSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.MotionSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.SensorEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.SwitchSensorAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.TemperatureSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
 
 @Service
 @RequiredArgsConstructor

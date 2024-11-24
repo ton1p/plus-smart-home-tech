@@ -3,7 +3,7 @@ package collector.event.model.hub;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.kafka.telemetry.collector.event.DeviceTypeAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceTypeAvro;
 
 @Getter
 @Setter

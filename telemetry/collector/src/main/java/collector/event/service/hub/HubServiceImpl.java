@@ -11,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.kafka.telemetry.collector.event.DeviceAddedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.DeviceRemovedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.HubEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.ScenarioAddedEventAvro;
-import ru.yandex.practicum.kafka.telemetry.collector.event.ScenarioRemovedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 
 @Service
 @RequiredArgsConstructor
