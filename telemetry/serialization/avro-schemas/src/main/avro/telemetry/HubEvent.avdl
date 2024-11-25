@@ -45,7 +45,7 @@ protocol HubEventProtocol {
     }
 
     record ScenarioRemovedEventAvro {
-        string name;
+        string id;
     }
 
     record HubEventAvro {
