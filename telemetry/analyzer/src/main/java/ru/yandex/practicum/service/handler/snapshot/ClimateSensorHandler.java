@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ConditionOperationAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 import ru.yandex.practicum.model.ScenarioAction;
 import ru.yandex.practicum.model.ScenarioCondition;
 import ru.yandex.practicum.repository.ScenarioActionRepository;
@@ -11,6 +12,8 @@ import ru.yandex.practicum.repository.ScenarioConditionRepository;
 import ru.yandex.practicum.service.AnalyzerGrpcService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +27,21 @@ public class ClimateSensorHandler extends BaseSensorHandler implements SnapshotS
         return ClimateSensorAvro.class.getSimpleName();
     }
 
+    private boolean checkExpressionByOperation(ConditionOperationAvro operation, int a, int b) {
+        switch (operation) {
+            case EQUALS -> {
+                return a == b;
+            }
+            case GREATER_THAN -> {
+                return a > b;
+            }
+            case LOWER_THAN -> {
+                return a < b;
+            }
+            case null, default -> throw new IllegalStateException("Unexpected operation: " + operation);
+        }
+    }
+
     @Override
     public void handle(String hubId, String sensorId, ClimateSensorAvro payload) {
         List<ScenarioCondition> scenarioConditions = scenarioConditionRepository.findAllBySensorIdAndSensorHubId(sensorId, hubId);
@@ -32,97 +50,41 @@ public class ClimateSensorHandler extends BaseSensorHandler implements SnapshotS
             return;
         }
 
-        for (ScenarioCondition scenarioCondition : scenarioConditions) {
-            ConditionOperationAvro operation = scenarioCondition.getCondition().getOperation();
-            String scenarioName = scenarioCondition.getScenario().getName();
-            List<ScenarioAction> scenarioActions = scenarioActionRepository.findAllByScenarioId(scenarioCondition.getScenario().getId());
+        Map<ConditionOperationAvro, Map<ConditionTypeAvro, Runnable>> conditionOperationToConditionType = scenarioConditions.stream()
+                .collect(Collectors.toMap(
+                        scenarioCondition -> scenarioCondition.getCondition().getOperation(),
+                        scenarioCondition -> Map.of(scenarioCondition.getCondition().getType(), () -> {
+                            List<ScenarioAction> scenarioActions = scenarioActionRepository.findAllByScenarioId(scenarioCondition.getScenario().getId());
+                            String scenarioName = scenarioCondition.getScenario().getName();
 
-            if (scenarioActions.isEmpty()) {
-                return;
-            }
-            
-            switch (operation) {
-                case EQUALS: {
-                    switch (scenarioCondition.getCondition().getType()) {
-                        case TEMPERATURE: {
-                            if (scenarioCondition.getCondition().getValue() == payload.getTemperatureC()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case HUMIDITY: {
-                            if (scenarioCondition.getCondition().getValue() == payload.getHumidity()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case CO2LEVEL: {
-                            if (scenarioCondition.getCondition().getValue() == payload.getCo2Level()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case null, default:
-                            throw new IllegalStateException("Unexpected value: " + operation);
-                    }
+                            ConditionTypeAvro type = scenarioCondition.getCondition().getType();
 
-                    break;
-                }
-                case GREATER_THAN: {
-                    switch (scenarioCondition.getCondition().getType()) {
-                        case TEMPERATURE: {
-                            if (scenarioCondition.getCondition().getValue() > payload.getTemperatureC()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
+                            switch (type) {
+                                case TEMPERATURE: {
+                                    if (checkExpressionByOperation(scenarioCondition.getCondition().getOperation(), payload.getTemperatureC(), scenarioCondition.getCondition().getValue())) {
+                                        executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
+                                    }
+                                    break;
+                                }
+                                case HUMIDITY: {
+                                    if (checkExpressionByOperation(scenarioCondition.getCondition().getOperation(), payload.getHumidity(), scenarioCondition.getCondition().getValue())) {
+                                        executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
+                                    }
+                                    break;
+                                }
+                                case CO2LEVEL: {
+                                    if (checkExpressionByOperation(scenarioCondition.getCondition().getOperation(), payload.getCo2Level(), scenarioCondition.getCondition().getValue())) {
+                                        executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
+                                    }
+                                    break;
+                                }
+                                case null, default:
+                                    throw new IllegalStateException("Unexpected value: " + type);
                             }
-                            break;
-                        }
-                        case HUMIDITY: {
-                            if (scenarioCondition.getCondition().getValue() > payload.getHumidity()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case CO2LEVEL: {
-                            if (scenarioCondition.getCondition().getValue() > payload.getCo2Level()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case null, default:
-                            throw new IllegalStateException("Unexpected value: " + operation);
-                    }
-                    break;
-                }
-                case LOWER_THAN: {
-                    switch (scenarioCondition.getCondition().getType()) {
-                        case TEMPERATURE: {
-                            if (scenarioCondition.getCondition().getValue() < payload.getTemperatureC()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case HUMIDITY: {
-                            if (scenarioCondition.getCondition().getValue() < payload.getHumidity()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case CO2LEVEL: {
-                            if (scenarioCondition.getCondition().getValue() < payload.getCo2Level()) {
-                                executeScenarioActions(hubId, scenarioActions, scenarioName, analyzerGrpcService);
-                            }
-                            break;
-                        }
-                        case null, default:
-                            throw new IllegalStateException("Unexpected value: " + operation);
-                    }
+                        })
+                ));
 
-                    break;
-                }
-                case null, default:
-                    throw new IllegalStateException("Unexpected value: " + operation);
-            }
-        }
+        conditionOperationToConditionType.values().forEach(i -> i.values().forEach(Runnable::run));
     }
 
 }
