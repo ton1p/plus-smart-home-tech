@@ -1,3 +1,12 @@
-grpc:
-  server:
-    port: 9090
+spring:
+  config:
+    import:
+      configserver:http://localhost:8888
+  application:
+    name: collector
+  cloud:
+    config:
+      retry:
+        use-random-policy: true
+        max-interval: 6000
+      fail-fast: true
