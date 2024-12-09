@@ -6,7 +6,14 @@ spring:
     name: analyzer
   cloud:
     config:
+      discovery:
+        enabled: true
+        service-id: config-server
       retry:
         use-random-policy: true
         max-interval: 6000
       fail-fast: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
