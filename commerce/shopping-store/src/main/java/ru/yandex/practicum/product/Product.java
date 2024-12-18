@@ -16,7 +16,7 @@ import ru.yandex.practicum.dto.product.QuantityState;
 @Getter
 @Setter
 @Entity
-@Table(name = "products")
+@Table(name = "products", schema = "product")
 public class Product {
     @Id
     @Size(max = 255)

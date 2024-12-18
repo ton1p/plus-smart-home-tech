@@ -18,11 +18,12 @@ import ru.yandex.practicum.dto.product.CreateUpdateProductDto;
 import ru.yandex.practicum.dto.product.ProductCategory;
 import ru.yandex.practicum.dto.product.ProductDto;
 import ru.yandex.practicum.dto.product.QuantityState;
+import ru.yandex.practicum.exception.ErrorHandler;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/shopping-store")
-public class ProductController {
+public class ProductController extends ErrorHandler {
     private final ProductService productService;
 
     @GetMapping

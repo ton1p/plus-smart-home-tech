@@ -61,10 +61,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDto> findAllByCategory(ProductCategory category, Pageable pageable) {
-        List<ProductDto> list = productRepository.findAllByProductCategory(category, pageable)
-                .stream()
-                .map(ProductMapper.INSTANCE::productToProductDto)
-                .toList();
+        List<ProductDto> list = ProductMapper.INSTANCE.productsToProductDtoItems(productRepository.findAllByProductCategory(category, pageable));
         return new PageImpl<>(list, pageable, list.size());
     }
 
