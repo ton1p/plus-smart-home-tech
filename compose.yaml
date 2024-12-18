@@ -46,3 +46,14 @@ services:
       POSTGRES_DB: analyzer-db
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
+
+  commerce-database:
+    image: postgres
+    container_name: commerce-database
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: commerce-db
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
