@@ -6,20 +6,27 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.cart.CartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.dto.warehouse.WarehouseDto;
 import ru.yandex.practicum.entity.Dimension;
 import ru.yandex.practicum.entity.Warehouse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.mapper.WarehouseMapper;
+import ru.yandex.practicum.operation.DeliveryOperations;
 import ru.yandex.practicum.repository.DimensionRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +40,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
     private final DimensionRepository dimensionRepository;
+    private final DeliveryOperations deliveryOperations;
 
     private Warehouse getWarehouseByProductId(String productId) {
         return warehouseRepository.findByProductId(productId).orElseThrow(() -> new NotFoundException("Product not found"));
@@ -55,7 +63,6 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    @Transactional
     public BookedProductsDto check(CartDto body) {
         List<Warehouse> products = warehouseRepository.findByProductIdIn(body.getProducts().keySet());
 
@@ -98,5 +105,47 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .house(CURRENT_ADDRESS)
                 .flat(CURRENT_ADDRESS)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public BookedProductsDto assemblyProducts(AssemblyProductsForOrderRequest assemblyProductsForOrderRequest) {
+        Map<String, Integer> products = new HashMap<>();
+        assemblyProductsForOrderRequest.getProducts().forEach((k, v) -> products.put(k.toString(), v));
+
+        CartDto cartDto = CartDto.builder()
+                .products(products)
+                .build();
+
+        BookedProductsDto bookedProductsDto = check(cartDto);
+
+        products.forEach((k, v) -> {
+            Optional<Warehouse> warehouseOptional = warehouseRepository.findByProductId(k);
+            if (warehouseOptional.isPresent()) {
+                Warehouse warehouse = warehouseOptional.get();
+                warehouse.setQuantity(warehouse.getQuantity() - v);
+                warehouseRepository.save(warehouse);
+            }
+        });
+
+        return bookedProductsDto;
+    }
+
+    @Override
+    @Transactional
+    public void returnProducts(Map<UUID, Integer> returnedProducts) {
+        returnedProducts.forEach((k, v) -> {
+            Optional<Warehouse> warehouseOptional = warehouseRepository.findByProductId(k.toString());
+            if (warehouseOptional.isPresent()) {
+                Warehouse warehouse = warehouseOptional.get();
+                warehouse.setQuantity(warehouse.getQuantity() + v);
+                warehouseRepository.save(warehouse);
+            }
+        });
+    }
+
+    @Override
+    public void requestDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        deliveryOperations.pickedUpDelivery(shippedToDeliveryRequest.getDeliveryId());
     }
 }

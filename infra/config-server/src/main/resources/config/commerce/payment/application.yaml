@@ -1,0 +1,12 @@
+server:
+  port: 0
+spring:
+  datasource:
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5437/payment-db
+  sql:
+    init:
+      mode: always
+

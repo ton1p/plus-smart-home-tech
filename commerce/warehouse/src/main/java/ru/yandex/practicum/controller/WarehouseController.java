@@ -11,12 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.dto.cart.CartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.dto.warehouse.WarehouseDto;
 import ru.yandex.practicum.exception.ErrorHandler;
 import ru.yandex.practicum.operation.WarehouseOperations;
 import ru.yandex.practicum.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +51,21 @@ public class WarehouseController extends ErrorHandler implements WarehouseOperat
     @PostMapping("/check")
     public BookedProductsDto checkCart(@RequestBody @Valid CartDto cartDto) {
         return warehouseService.check(cartDto);
+    }
+
+    @Override
+    @PostMapping("/assembly")
+    public BookedProductsDto assemblyProducts(@RequestBody @Valid AssemblyProductsForOrderRequest assemblyProductsForOrderRequest) {
+        return warehouseService.assemblyProducts(assemblyProductsForOrderRequest);
+    }
+
+    @Override
+    public void returnProducts(Map<UUID, Integer> returnedProducts) {
+        warehouseService.returnProducts(returnedProducts);
+    }
+
+    @Override
+    public void requestDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        warehouseService.requestDelivery(shippedToDeliveryRequest);
     }
 }

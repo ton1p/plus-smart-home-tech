@@ -6,6 +6,7 @@ import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface CartService {
     CartDto getCartByUsername(String username);
@@ -19,4 +20,6 @@ public interface CartService {
     CartDto changeQuantity(String username, ChangeProductQuantityRequest changeProductQuantityRequest);
 
     BookedProductsDto bookingProducts(String username);
+
+    String getCartUsername(UUID cartId);
 }

@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.entity.Cart;
 import ru.yandex.practicum.entity.CartState;
 import ru.yandex.practicum.entity.ProductQuantity;
+import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.operation.WarehouseOperations;
 import ru.yandex.practicum.repository.CartRepository;
 import ru.yandex.practicum.repository.ProductQuantityRepository;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +98,12 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCart(username);
         CartDto cartDto = toCartDto(cart);
         return warehouseOperations.checkCart(cartDto);
+    }
+
+    @Override
+    public String getCartUsername(UUID cartId) {
+        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new NotFoundException("Cart not found"));
+        return cart.getUsername();
     }
 
     private Map<String, Integer> listProductQuantityToMap(final List<ProductQuantity> productQuantities) {

@@ -13,6 +13,7 @@ import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @FeignClient(name = "shopping-cart", path = "/api/v1/shopping-cart")
 public interface CartOperations {
@@ -33,4 +34,7 @@ public interface CartOperations {
 
     @PostMapping("/booking")
     BookedProductsDto bookingProducts(@RequestParam String username);
+
+    @GetMapping("/username")
+    String getCartUsername(@RequestParam UUID cartId);
 }
