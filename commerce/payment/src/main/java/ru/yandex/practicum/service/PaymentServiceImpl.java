@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.dto.payment.PaymentStatus;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ShoppingStoreOperations shoppingStoreOperations;
@@ -31,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentDto createPayment(OrderDto orderDto) {
         final Payment payment = Payment.builder()
                 .totalPayment(getTotalCost(orderDto))
@@ -60,6 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void successfulPayment(UUID paymentId) {
         Payment payment = getPaymentById(paymentId);
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
@@ -67,6 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void failedPayment(UUID paymentId) {
         Payment payment = getPaymentById(paymentId);
         payment.setPaymentStatus(PaymentStatus.FAILED);

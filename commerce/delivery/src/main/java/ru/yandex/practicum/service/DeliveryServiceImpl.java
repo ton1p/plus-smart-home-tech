@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.delivery.DeliveryState;
 import ru.yandex.practicum.dto.order.OrderDto;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
 
@@ -24,6 +26,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    @Transactional
     public DeliveryDto createDelivery(DeliveryDto deliveryDto) {
         Delivery delivery = Delivery.builder()
                 .fromAddress(AddressMapper.INSTANCE.addressDtoToAddress(deliveryDto.getFromAddress()))
@@ -36,6 +39,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    @Transactional
     public void successfulDelivery(UUID deliveryId) {
         Delivery delivery = getById(deliveryId);
         delivery.setDeliveryState(DeliveryState.DELIVERED);
@@ -43,6 +47,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    @Transactional
     public void pickedUpDelivery(UUID deliveryId) {
         Delivery delivery = getById(deliveryId);
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
@@ -50,6 +55,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    @Transactional
     public void failedDelivery(UUID deliveryId) {
         Delivery delivery = getById(deliveryId);
         delivery.setDeliveryState(DeliveryState.FAILED);
