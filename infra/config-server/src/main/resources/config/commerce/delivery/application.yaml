@@ -1,0 +1,12 @@
+server:
+  port: 0
+spring:
+  datasource:
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5438/delivery-db
+  sql:
+    init:
+      mode: always
+

@@ -18,6 +18,7 @@ import ru.yandex.practicum.service.CartService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,5 +60,11 @@ public class CartController extends ErrorHandler implements CartOperations {
     @PostMapping("/booking")
     public BookedProductsDto bookingProducts(@RequestParam String username) {
         return cartService.bookingProducts(username);
+    }
+
+    @Override
+    @GetMapping("/username")
+    public String getCartUsername(UUID cartId) {
+        return cartService.getCartUsername(cartId);
     }
 }
